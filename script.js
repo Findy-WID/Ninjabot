@@ -1,122 +1,56 @@
-// document.addEventListener("DOMContentLoaded", loadChatHistory);
+// Get the button and the body element
+const themeToggleButton = document.getElementById('theme-toggle');
+const body = document.body;
 
-// const chatContainer = document.getElementById("chat-container");
-// const inputField = document.getElementById("chat-input");
-// const sendBtn = document.getElementById("send-btn");
+// Check if dark mode is already set in localStorage
+if (localStorage.getItem('theme') === 'dark') {
+  body.classList.add('dark-mode');
+  themeToggleButton.textContent = 'Dark Mode';
+} else {
+  body.classList.remove('dark-mode');
+  themeToggleButton.textContent = 'Dark Mode';
+}
 
-// // Send message on button click
-// sendBtn.addEventListener("click", sendMessage);
+// Toggle dark and light modes
+themeToggleButton.addEventListener('click', () => {
+  body.classList.toggle('dark-mode');
+  
+  // Save the current theme in localStorage so it persists across sessions
+  if (body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+    themeToggleButton.textContent = 'Dark Mode';
+  } else {
+    localStorage.setItem('theme', 'light');
+    themeToggleButton.textContent = 'Dark Mode';
+  }
+});
 
-// // Send message on Enter key press
-// inputField.addEventListener("keypress", function (event) {
-//     if (event.key === "Enter") {
-//         event.preventDefault();
-//         sendMessage();
-//     }
-// });
+  // Check if the browser supports SpeechRecognition
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// function sendMessage() {
-//     let message = inputField.value.trim();
-//     if (message === "") return;
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // You can change the language
+    recognition.interimResults = true; // Show results even while speaking
 
-//     // Display User Message
-//     displayMessage("user", message);
-//     saveMessage("user", message);
+    const startButton = document.getElementById('start-btn');
+    const output = document.getElementById('output');
 
-//     inputField.value = ""; // Clear input
+    startButton.addEventListener('click', () => {
+      recognition.start(); // Start speech recognition
+    });
 
-//     // Show Typing Animation
-//     showTypingAnimation();
-
-//     setTimeout(() => {
-//         let botResponse = getPredefinedResponse(message);
-//         displayMessage("bot", botResponse);
-//         saveMessage("bot", botResponse);
-//     }, 1000);
-// }
-
-// function displayMessage(role, message) {
-//     let messageDiv = document.createElement("div");
-//     messageDiv.classList.add("chat", role);
-
-//     messageDiv.innerHTML = `
-//         <div class="chat-content">
-//             <div class="chat-details">
-//                 <img src="${role === 'user' ? './user.jpg' : './ninjabotgirl.jpg'}" alt="${role}">
-//                 <p>${message}</p>
-//             </div>
-//         </div>
-//     `;
-
-//     if (role === "bot") {
-//         let copyBtn = document.createElement("button");
-//         copyBtn.classList.add("copy-btn");
-//         copyBtn.innerHTML = "📋";
-//         copyBtn.onclick = () => copyText(message);
-//         messageDiv.querySelector(".chat-details").appendChild(copyBtn);
-//     }
-
-//     chatContainer.appendChild(messageDiv);
-//     chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
-// }
-
-// function saveMessage(role, message) {
-//     let chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
-//     chatHistory.push({ role, message });
-//     localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-// }
-
-// function loadChatHistory() {
-//     let chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
-//     chatHistory.forEach(chat => displayMessage(chat.role, chat.message));
-// }
-
-// function copyText(text) {
-//     navigator.clipboard.writeText(text).then(() => {
-//         alert("Copied to clipboard!");
-//     }).catch(err => {
-//         console.error("Error copying text: ", err);
-//     });
-// }
-
-// // Function for Predefined Responses
-// function getPredefinedResponse(userText) {
-//     const responses = {
-//         "hello": "Hi there! How can I help you?",
-//         "how are you": "I'm just a chatbot, but I'm doing great! How about you?",
-//         "what is your name": "I'm NinjaBot, your friendly assistant!",
-//         "bye": "Goodbye! Have a great day!",
-//         "default": "I'm not sure how to respond to that. Try asking something else!"
-//     };
-
-//     // Convert user text to lowercase for better matching
-//     let lowerText = userText.toLowerCase();
-
-//     return responses[lowerText] || responses["default"];
-// }
-
-// // Typing Animation
-// function showTypingAnimation() {
-//     let typingDiv = document.createElement("div");
-//     typingDiv.classList.add("chat", "incoming");
-
-//     typingDiv.innerHTML = `
-//         <div class="chat-content">
-//             <div class="chat-details">
-//                 <img src="./ninjabotgirl.jpg" alt="ninjabot">
-//                 <div class="typing-animation">
-//                     <div class="typing-dot" style="--delay: 0.2s"></div>
-//                     <div class="typing-dot" style="--delay: 0.3s"></div>
-//                     <div class="typing-dot" style="--delay: 0.4s"></div>
-//                 </div>
-//             </div>
-//         </div>
-//     `;
-
-//     chatContainer.appendChild(typingDiv);
-//     chatContainer.scrollTop = chatContainer.scrollHeight;
-
-//     setTimeout(() => {
-//         typingDiv.remove();
-//     }, 1000);
-// }
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      //output.textContent = transcript; // Show the recognized text
+     
+    };
+    recognition.onerror = (event) => {
+      console.error('Speech Recognition Error:', event.error);
+    };
+  } else {
+    console.log('Speech Recognition API is not supported in this browser.');
+  }
