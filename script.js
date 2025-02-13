@@ -45,7 +45,7 @@ themeToggleButton.addEventListener('click', () => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
-      // output.textContent = transcript; // Show the recognized text
+      //output.textContent = transcript; // Show the recognized text
      
     };
     recognition.onerror = (event) => {
@@ -54,7 +54,3 @@ themeToggleButton.addEventListener('click', () => {
   } else {
     console.log('Speech Recognition API is not supported in this browser.');
   }
-
-
-
-
