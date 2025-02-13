@@ -1,8 +1,72 @@
-       body {
+  /* 🌟 Color Variables for Consistency */
+:root {
+    /* 🎨 Core Colors */
+    --primary-color: #0078D4; /* Main Accent Color (Used for buttons, highlights) */
+    --secondary-color: #005A9E; /* Darker shade for hover effects */
+    --background-light: #F0F0F0; /* Light mode background */
+    --background-dark: #1A1A1A; /* Dark mode background */
+    --text-light: #FFFFFF; /* White text for dark mode */
+    --text-dark: #333333; /* Dark text for light mode */
+    --border-color: #DDDDDD; /* Border for chat bubbles, input box */
+
+    /* 🗨️ Chat Interface */
+    --user-message-bg: #DCF8C6; /* Light green (WhatsApp-like) */
+    --bot-message-bg: #E5E5EA; /* Light gray (iMessage-like) */
+    --input-box-bg: #FFFFFF; /* Input box background */
+    --send-button-bg: var(--primary-color); /* Send button */
+    --send-button-hover: var(--secondary-color); /* Hover effect */
+
+    /* 🌙 Dark/Light Mode */
+    --dark-mode-toggle-bg: #444; /* Toggle switch background */
+    --dark-mode-toggle-knob: #FFF; /* Toggle knob */
+    
+    /* 🔄 Typing Animation */
+    --typing-bubble: #CCCCCC; /* Light gray for typing dots */
+
+    /* 📋 Copy-to-Clipboard */
+    --copy-icon-color: #888; /* Neutral gray */
+    --copy-icon-hover: #555; /* Darker gray */
+
+    /* 🎭 Landing Page */
+    --landing-bg: linear-gradient(to right, #0078D4, #005A9E); /* Gradient background */
+    --landing-text-color: white; /* Text color for contrast */
+    --get-started-button: #FFA500; /* Orange for CTA */
+}
+  
+  
+  
+  body {
            background-color: #f8f9fa;
            font-family: 'Inter', sans-serif;
        }
+       
+    
+    body.dark-mode {
+        background-color: var(--background-dark);
+        color: var(--text-dark);}
 
+        body.dark-mode .chat-container{
+            background-color: var(--background-dark);
+            color: var(--text-light);
+        }
+    
+    body.dark-mode .chat-content{
+        background-color: var(--background-dark);
+        color: var(--text-light);}
+        
+        body.dark-mode .chat.chat.incoming{
+            background-color: var(--background-dark);
+            border: 1xp solid var(--copy-icon-color);
+            color: var(--text-dark);}
+    
+            body.dark-mode .chat.outgoing{
+                /* background-color: var(--dark-mode-toggle-bg); */
+                border: 1xp solid var(--copy-icon-color);
+                color: var(--text-light);}
+    
+                body.dark-mode .typing-container{
+                    background-color: var(--dark-mode-toggle-bg);
+                    color: var(--text-dark);}
        .chat-container {
            max-width: 100%;
            margin: auto;
@@ -106,8 +170,32 @@
            border-radius: 50%;
            cursor: pointer;
            transition: background 0.3s;
+           
        }
 
        .send-button:hover {
            background: #0056b3;
        }
+      
+       #start-btn{
+        margin: 1.5rem 0.4rem;
+        padding: rem;
+        /* font-size: 0.8rem; */
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        background: white;
+      
+     }  
+
+
+       button {
+        margin: 0.8rem 0.2rem;
+        padding: 0.7rem;
+        font-size: 0.8rem;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        background: white;
+      
+     }  
