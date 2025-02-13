@@ -120,3 +120,98 @@
 //         typingDiv.remove();
 //     }, 1000);
 // }
+
+import CONFIG from "./config";
+
+const chatinput = document.getElementById("chat-input");
+const sendbtn = document.getElementById("send-btn");
+const chatContainer = document.querySelector(".chat-container");
+
+let userText = null;
+const API_KEY = CONFIG.API_KEY;
+
+const createElement = (html, className) => {
+    const chatDiv = document.createElement("div");
+    chatDiv.classList.add("chat", className);
+    chatDiv.innerHTML = html;
+    return chatDiv;
+}
+
+const getChatResponse = async (incomingChatDiv) => {
+    const API_URL = CONFIG.BASE_URL;
+    const pElement = document.createElement("p");
+    
+    // Define the properties and data for the API request
+    const requestOptions = {
+        method: "POST",
+        headers: {        
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+            model: "text-davinci-003",
+            prompt: userText,
+            max_tokens: 2048,
+            temperature: 0.2,
+            n: 1,
+            stop: null
+        })
+    }
+
+    try {
+        const response = await (await fetch(API_URL, requestOptions)).JSON();
+        pElement.textContent = response.choices[0].text;
+        
+    } catch (error) {
+        console.log(error);
+    }
+
+    incomingChatDiv.querySelector(".typing-animation").remove();
+    incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
+}  
+
+const showTyingAnimation = () => { 
+    const html = ` div class="chat-content">
+                <div class="chat-details">
+                    <img src="./ninjabotgirl.jpg" alt="ninjabot">
+                     <div class="typing-animation">
+                        <div class="typing-dot" style="--delay: 0.2s"></div>
+                        <div class="typing-dot" style="--delay: 0.3s"></div>
+                        <div class="typing-dot" style="--delay: 0.4s"></div>
+                     </div>
+                </div>
+                <span class="material-symbols-rounded">content_copy</span>
+            </div>`;
+
+// Create an outgoing chat div with user's message and append it to chat container
+const incomingChatDiv = createElement(html, "incoming");
+chatContainer.appendChild(incomingChatDiv);
+getChatResponse();
+}
+ 
+const handleOutgoingChat = () => { 
+    userText = chatinput.value.trim();
+    //if (!userText) return;  Prevent sending empty messages
+
+    const html = `<div class="chat-content">
+                    <div class="chat-details">
+                        <img src="./user.jpg" alt="user">
+                        <p>${userText}</p>
+                    </div>
+                </div>`;
+    
+    const outgoingChatDiv = createElement(html, "outgoing");
+    chatContainer.appendChild(outgoingChatDiv); 
+    // chatinput.value = ""; Clear input field after sending message
+    setTimeout(showTyingAnimation, 500);
+}
+
+sendbtn.addEventListener('click', handleOutgoingChat);
+
+
+
+// Create an outgoing chat div with user's message and append it to chat container
+setTimeout(showTyingAnimation, 500);
+
+//Remove the typing animation, append the paragraph element and save the chats to local storage
+incomingChatDiv.querySelector(".typing-animation").remove();
