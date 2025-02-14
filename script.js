@@ -146,3 +146,39 @@ setTimeout(showTyingAnimation, 500);
 incomingChatDiv.querySelector(".typing-animation").remove();
 
 // Logic for chat input box and send button
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      //output.textContent = transcript; // Show the recognized text
+     
+    };
+    recognition.onerror = (event) => {
+      console.error('Speech Recognition Error:', event.error);
+    };
+  } else {
+    console.log('Speech Recognition API is not supported in this browser.');
+  }
+
+  //Emoji
+let click = false;
+
+function show_emoji() {
+    const emojiContainer = document.getElementById("emoji-popup");
+    if (click == false) {
+        emojiContainer.style.display = "grid";  
+        click = true;
+    } else {
+        emojiContainer.style.display = "none";  
+        click = false;
+    }
+}
+
+function emoji(id) {
+    const emojiChar = document.getElementById(id).innerHTML; 
+    const inputField = document.getElementById("chat-input"); 
+
+    // Append the selected emoji to the input field
+    inputField.value += emojiChar;
+}
