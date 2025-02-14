@@ -199,3 +199,112 @@
         background: white;
       
      }  
+
+     /* Emoji styling */
+
+.typing-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  .emoji-img {
+    cursor: pointer;
+    width: 40px; 
+    height: auto; 
+    margin-right: -50%; 
+  }
+  
+  .emoji {
+    position: absolute;
+    bottom: 60px; 
+    left: 0; 
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); 
+    gap: 8px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; 
+    z-index: 999;
+    max-height: 300px; 
+    overflow-y: auto; 
+  }
+  
+  .emoji span {
+    font-size: 20px;
+    cursor: pointer;
+    display: inline-block;
+  }
+  
+  .emoji span:hover {
+    opacity: 0.7; 
+  }
+  
+ 
+/* Landing page styling */
+
+main {
+height: 100vh;
+width: 100%;
+border-radius: 10px;
+border: 30px;
+background: #dfc5fe;
+}
+main .text_content {
+position: absolute;
+left: 7%;
+top: 33%;
+z-index: 12;
+}
+main .text_content .text1 {
+font-size: 35px; 
+margin-bottom: 10px;
+margin-right: 0;
+margin-left: 0; 
+color: #111810;
+}
+
+main .text_content .job {
+color: #2c3350;
+font-size: 15px;
+line-height: 100%;
+margin: 5px 0;
+margin-top: -5px;
+}
+.button {
+margin: 20px 0 0 50px;
+}
+
+.text_content .button button {
+width: 40%;
+outline: none;
+margin: 0 10px;
+border: none;
+border-radius: 20px;
+font-size: 18px;
+color: #fff;
+padding: 8px 16px;
+cursor: pointer;
+transition: all 0.3s ease;
+background-color: #9169c1;
+}
+
+.text_content .button button:hover {
+transform: scale(0.98);
+}
+
+.nin-bot {
+font-size: 20px;
+color: #292827;
+}
+
+.img1 {
+position: absolute;
+ width: 600px; 
+height: 150%;
+left: 120%;
+bottom: 0;
+}  
