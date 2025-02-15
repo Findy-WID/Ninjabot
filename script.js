@@ -1,149 +1,145 @@
-// Get the button and the body element
-const themeToggleButton = document.getElementById("theme-toggle");
-const body = document.body;
+import CONFIG from "./config.js";
 
-// Check if dark mode is already set in localStorage
-if (localStorage.getItem("theme") === "dark") {
-  body.classList.add("dark-mode");
-  themeToggleButton.textContent = "Light Mode";
-} else {
-  body.classList.remove("dark-mode");
-  themeToggleButton.textContent = "Dark Mode";
-}
+const API_URL = "CONFIG.API_URL";
+const API_KEY = "CONFIG.API_KEY"; 
+const chatContainer = document.querySelector(".chat-container");
+const chatInput = document.getElementById("chat-input");
+const sendButton = document.querySelector(".send-button");
+const themeToggle = document.getElementById("theme-toggle");
+const emojiPopup = document.getElementById("emoji-popup");
+let isCooldown = false; // Cooldown flag
 
-// Toggle dark and light modes
-themeToggleButton.addEventListener("click", () => {
-  body.classList.toggle("dark-mode");
-  if (body.classList.contains("dark-mode")) {
-    localStorage.setItem("theme", "dark");
-    themeToggleButton.textContent = "Light Mode";
-  } else {
-    localStorage.setItem("theme", "light");
-    themeToggleButton.textContent = "Dark Mode";
-  }
+// Handle sending message
+sendButton.addEventListener("click", sendMessage);
+chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
 });
 
-// Check if the browser supports SpeechRecognition
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = true;
-
-  const startButton = document.getElementById("start-btn");
-  const output = document.getElementById("output");
-
-  startButton.addEventListener("click", () => {
-    recognition.start();
-  });
-
-  recognition.onresult = (event) => {
-    let transcript = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
+// Send user message to chat and fetch AI response
+function sendMessage() {
+    if (isCooldown) {
+        alert("You are sending messages too fast! Please wait a moment.");
+        return;
     }
-    output.textContent = transcript;
-  };
+    
+    const userText = chatInput.value.trim();
+    if (!userText) return;
 
-  recognition.onerror = (event) => {
-    console.error("Speech Recognition Error:", event.error);
-  };
-} else {
-  console.log("Speech Recognition API is not supported in this browser.");
+    // Add user message to chat
+    createChatBubble(userText, true);
+    chatInput.value = "";
+
+    // Show typing animation
+    const typingIndicator = createTypingBubble();
+
+    // Apply cooldown
+    isCooldown = true;
+    sendButton.disabled = true;
+    setTimeout(() => {
+        isCooldown = false;
+        sendButton.disabled = false;
+    }, 5000); // 5 seconds cooldown
+
+    // Fetch AI response with a delay (to handle rate limits)
+    setTimeout(() => {
+        fetchAIResponse(userText, typingIndicator);
+    }, 2000);
 }
 
-const chatInput = document.getElementById("chat-input");
-const sendBtn = document.querySelector(".send-button");
-const chatContainer = document.querySelector(".chat-container");
+// Fetch AI response from OpenAI API
+async function fetchAIResponse(userText, typingIndicator) {
+    try {
+        const response = await fetch(CONFIG.API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${CONFIG.API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: userText }],
+            }),
+        });
 
-let userText = "";
-const API_KEY =process.env.API_KEY;
+        if (response.status === 429) {
+            chatContainer.removeChild(typingIndicator);
+            createChatBubble("Too many requests! Please wait a moment before trying again. ⏳", false);
+            return;
+        }
 
-const createElement = (html, className) => {
-  const chatDiv = document.createElement("div");
-  chatDiv.classList.add("chat", className);
-  chatDiv.innerHTML = html;
-  return chatDiv;
-};
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-const getChatResponse = async (incomingChatDiv) => {
-  const API_URL = process.env.BASE_URL;
-  const pElement = document.createElement("p");
+        const data = await response.json();
+        chatContainer.removeChild(typingIndicator);
+        createChatBubble(data.choices[0].message.content, false);
+    } catch (error) {
+        console.error("Error fetching AI response:", error);
+        chatContainer.removeChild(typingIndicator);
+        createChatBubble("Error fetching response 😔", false);
+    }
+}
 
-  const requestOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "text-davinci-003",
-      prompt: userText,
-      max_tokens: 2048,
-      temperature: 0.2,
-      n: 1,
-    }),
-  };
+// Create chat bubble (user or AI)
+function createChatBubble(text, isUser) {
+    const chatBubble = document.createElement("div");
+    chatBubble.classList.add("chat", isUser ? "outgoing" : "incoming");
 
-  try {
-    const response = await fetch(API_URL, requestOptions);
-    const data = await response.json();
-      console.log(data,"what is inside here")
-    pElement.textContent = data.choices[0].text;
-  } catch (error) {
-    console.log(error);
-  }
+    const chatImage = document.createElement("img");
+    chatImage.src = isUser ? "./user.jpg" : "./ninjabotgirl.jpg";
+    chatImage.alt = isUser ? "User" : "NinjaBot";
 
-  incomingChatDiv.querySelector(".typing-animation").remove();
-  incomingChatDiv.querySelector(".chat-details").appendChild(pElement);
-};
+    const chatContent = document.createElement("div");
+    chatContent.classList.add("chat-content");
+    chatContent.textContent = text;
 
-const showTypingAnimation = () => {
-  const html = `<div class="chat-content">
-                <div class="chat-details">
-                    <img src="./ninjabotgirl.jpg" alt="ninjabot">
-                     <div class="typing-animation">
-                        <div class="typing-dot" style="--delay: 0.2s"></div>
-                        <div class="typing-dot" style="--delay: 0.3s"></div>
-                        <div class="typing-dot" style="--delay: 0.4s"></div>
-                     </div>
-                </div>
-                <span class="material-symbols-rounded">content_copy</span>
-            </div>`;
+    chatBubble.appendChild(chatImage);
+    chatBubble.appendChild(chatContent);
+    chatContainer.appendChild(chatBubble);
 
-  const incomingChatDiv = createElement(html, "incoming");
-  chatContainer.appendChild(incomingChatDiv);
-  getChatResponse(incomingChatDiv);
-};
+    // Scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-const handleOutgoingChat = () => {
-  userText = chatInput.value.trim();
-  if (!userText) return;
+// Create typing indicator
+function createTypingBubble() {
+    const typingBubble = document.createElement("div");
+    typingBubble.classList.add("chat", "incoming");
 
-  const html = `<div class="chat-content">
-                    <div class="chat-details">
-                        <img src="./user.jpg" alt="user">
-                        <p>${userText}</p>
-                    </div>
-                </div>`;
+    const chatImage = document.createElement("img");
+    chatImage.src = "./ninjabotgirl.jpg";
+    chatImage.alt = "NinjaBot";
 
-  const outgoingChatDiv = createElement(html, "outgoing");
-  chatContainer.appendChild(outgoingChatDiv);
-  chatInput.value = "";
-  setTimeout(showTypingAnimation, 500);
-};
+    const typingContent = document.createElement("div");
+    typingContent.classList.add("chat-content");
 
-sendBtn.addEventListener("click", handleOutgoingChat);
+    const typingAnimation = document.createElement("div");
+    typingAnimation.classList.add("typing-animation");
+    typingAnimation.innerHTML = "<span></span> <span></span> <span></span>";
 
-// Emoji logic
-let click = false;
+    typingContent.appendChild(typingAnimation);
+    typingBubble.appendChild(chatImage);
+    typingBubble.appendChild(typingContent);
+    chatContainer.appendChild(typingBubble);
+
+    return typingBubble;
+}
+
+// Handle dark mode toggle
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    themeToggle.textContent = document.body.classList.contains("dark-mode") ? "Light Mode" : "Dark Mode";
+});
+
+// Show/hide emoji popup
 function show_emoji() {
-  const emojiContainer = document.getElementById("emoji-popup");
-  emojiContainer.style.display = click ? "none" : "grid";
-  click = !click;
+    emojiPopup.style.display = emojiPopup.style.display === "block" ? "none" : "block";
 }
 
-function emoji(id) {
-  const emojiChar = document.getElementById(id).innerHTML;
-  chatInput.value += emojiChar;
+// Insert emoji into input
+function emoji(emojiId) {
+    const selectedEmoji = document.getElementById(emojiId).textContent;
+    chatInput.value += selectedEmoji;
 }
