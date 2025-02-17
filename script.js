@@ -51,23 +51,22 @@ function sendMessage() {
 
     // Fetch AI response
     // Fetch AI response with a delay (to handle rate limits)
-    setTimeout(() => {
-        fetchAIResponse(userText, typingIndicator);
-    }, 2000);
+    // setTimeout(() => {
+    //     fetchAIResponse(userText, typingIndicator);
+    // }, 2000);
 }
 
 // Fetch AI response
 //userText, typingIndicator
 async function generateAIResponse(userText) {
     try {
-      const response = await axios.post('/netlifyFunctions/fetchAI', { prompt: userText });
-  
-      return response.data.response;
+        const response = await axios.post('/netlifyFunctions/fetchAI', { prompt: userText });
+        return response.data.response;
     } catch (error) {
-      console.error("Error calling Gemini API:", error);
-      throw error;
+        console.error("Error calling Gemini API:", error);
+        throw error;
     }
-  }
+}
 
 // Create chat bubble (user or AI)
 function createChatBubble(text, isUser) {
