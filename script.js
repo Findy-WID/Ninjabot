@@ -24,6 +24,7 @@ chatInput.addEventListener("keypress", (e) => {
     }
 });
 
+// Send user message to chat and fetch AI response
 function sendMessage() {
     if (isCooldown) {
         alert("You are sending messages too fast! Please wait a moment.");
@@ -49,6 +50,7 @@ function sendMessage() {
     }, 5000); // 5 seconds cooldown
 
     // Fetch AI response
+    // Fetch AI response with a delay (to handle rate limits)
     setTimeout(() => {
         fetchAIResponse(userText, typingIndicator);
     }, 2000);
