@@ -4,7 +4,6 @@ const sendButton = document.querySelector(".send-button");
 const themeToggle = document.getElementById("theme-toggle");
 const emojiPopup = document.getElementById("emoji-popup");
 let isCooldown = false; // Cooldown flag
-// const API_KEY = ""; // Ensure this is kept secure!
 
 // Load chat history and theme from local storage
 const loadDataFromLocalStorage = () => {
@@ -49,15 +48,26 @@ function sendMessage() {
         sendButton.disabled = false;
     }, 5000); // 5 seconds cooldown
 
-    // Fetch AI response
     // Fetch AI response with a delay (to handle rate limits)
-    // setTimeout(() => {
-    //     fetchAIResponse(userText, typingIndicator);
-    // }, 2000);
+    setTimeout(() => {
+        fetchAIResponse(userText, typingIndicator);
+    }, 2000);
 }
 
-// Fetch AI response
-//userText, typingIndicator
+// Fetch AI response from your API
+async function fetchAIResponse(userText, typingIndicator) {
+    try {
+        const response = await generateAIResponse(userText);
+        chatContainer.removeChild(typingIndicator);
+        createChatBubble(response, false);
+    } catch (error) {
+        console.error("Error fetching AI response:", error);
+        chatContainer.removeChild(typingIndicator);
+        createChatBubble("Error fetching response 😔", false);
+    }
+}
+
+// Generate AI response
 async function generateAIResponse(userText) {
     try {
         const response = await axios.post('/netlifyFunctions/fetchAI', { prompt: userText });
@@ -132,19 +142,22 @@ function emoji(emojiId) {
     chatInput.value += selectedEmoji;
 }
 
-// Load chat history on page load
-// loadDataFromLocalStorage();
-
-// import CONFIG from "./config.js";
-
-// const API_URL = CONFIG.API_URL;
-// const API_KEY = CONFIG.API_KEY; 
 // const chatContainer = document.querySelector(".chat-container");
 // const chatInput = document.getElementById("chat-input");
 // const sendButton = document.querySelector(".send-button");
 // const themeToggle = document.getElementById("theme-toggle");
 // const emojiPopup = document.getElementById("emoji-popup");
 // let isCooldown = false; // Cooldown flag
+// // const API_KEY = ""; // Ensure this is kept secure!
+
+// // Load chat history and theme from local storage
+// const loadDataFromLocalStorage = () => {
+//     const themeColor = localStorage.getItem("themeColor");
+//     document.body.classList.toggle("light-mode", themeColor === "light_mode");
+//     themeToggle.textContent = document.body.classList.contains("light-mode") ? "Dark Mode" : "Light Mode";
+
+//     chatContainer.innerHTML = localStorage.getItem("all-chats") || "";
+// };
 
 // // Handle sending message
 // sendButton.addEventListener("click", sendMessage);
@@ -180,42 +193,22 @@ function emoji(emojiId) {
 //         sendButton.disabled = false;
 //     }, 5000); // 5 seconds cooldown
 
+//     // Fetch AI response
 //     // Fetch AI response with a delay (to handle rate limits)
-//     setTimeout(() => {
-//         fetchAIResponse(userText, typingIndicator);
-//     }, 2000);
+//     // setTimeout(() => {
+//     //     fetchAIResponse(userText, typingIndicator);
+//     // }, 2000);
 // }
 
-// // Fetch AI response from OpenAI API
-// async function fetchAIResponse(userText, typingIndicator) {
+// // Fetch AI response
+// //userText, typingIndicator
+// async function generateAIResponse(userText) {
 //     try {
-//         const response = await fetch(CONFIG.API_URL, {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "Authorization": `Bearer ${CONFIG.API_KEY}`,
-//             },
-//             body: JSON.stringify({
-//                 model: "gpt-3.5-turbo",
-//                 messages: [{ role: "user", content: userText }],
-//             }),
-//         });
-
-//         if (response.status === 429) {
-//             chatContainer.removeChild(typingIndicator);
-//             createChatBubble("Too many requests! Please wait a moment before trying again. ⏳", false);
-//             return;
-//         }
-
-//         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-//         const data = await response.json();
-//         chatContainer.removeChild(typingIndicator);
-//         createChatBubble(data.choices[0].message.content, false);
+//         const response = await axios.post('/netlifyFunctions/fetchAI', { prompt: userText });
+//         return response.data.response;
 //     } catch (error) {
-//         console.error("Error fetching AI response:", error);
-//         chatContainer.removeChild(typingIndicator);
-//         createChatBubble("Error fetching response 😔", false);
+//         console.error("Error calling Gemini API:", error);
+//         throw error;
 //     }
 // }
 
@@ -264,10 +257,12 @@ function emoji(emojiId) {
 //     return typingBubble;
 // }
 
-// // Handle dark mode toggle
+// // Toggle theme
 // themeToggle.addEventListener("click", () => {
 //     document.body.classList.toggle("dark-mode");
-//     themeToggle.textContent = document.body.classList.contains("dark-mode") ? "Light Mode" : "Dark Mode";
+//     const newTheme = document.body.classList.contains("dark-mode") ? "Light Mode" : "Dark Mode";
+//     localStorage.setItem("themeColor", newTheme);
+//     themeToggle.textContent = newTheme;
 // });
 
 // // Show/hide emoji popup
@@ -280,3 +275,8 @@ function emoji(emojiId) {
 //     const selectedEmoji = document.getElementById(emojiId).textContent;
 //     chatInput.value += selectedEmoji;
 // }
+
+
+
+// Load chat history on page load
+// loadDataFromLocalStorage();
