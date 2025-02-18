@@ -72,8 +72,8 @@ async function fetchAIResponse(userText, typingIndicator) {
 // Generate AI response
 async function generateAIResponse(userText) {
     try {
-        const response = await axios.post('/netlifyFunctions/fetchAI', { prompt: userText });
-        return response.data.response;
+        const response = await axios.post('/.netlifyFunctions/fetchAI', { prompt: userText, });
+        return response.data;
     } catch (error) {
         console.error("Error calling Gemini API:", error);
         throw error;
