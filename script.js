@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const chatContainer = document.querySelector(".chat-container");
 const chatInput = document.getElementById("chat-input");
 const sendButton = document.querySelector(".send-button");
